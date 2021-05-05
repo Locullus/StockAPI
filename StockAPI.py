@@ -1,10 +1,15 @@
 """
+Programme qui se connecte à une API et renvoit les données concernant un produit de bourse particulier.
+Ne semble pas disponible pour les actions européennes.
+
 To claim your free API key with lifetime access, visit this page :
     https://www.alphavantage.co/support
+
 """
+
+import sys
 import json
 import os
-
 import requests
 from dotenv import load_dotenv
 
@@ -13,14 +18,20 @@ load_dotenv()
 API_KEY = os.getenv('API_KEY')
 API_url = 'https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol={}&apikey={}'
 
+# le produit financier dont on veut récupérer les données
 stock = 'IBM'
+
 # on crée un dictionnaire au format texte avec la réponse à une requête reçue en json
 response = requests.get(API_url.format(stock, API_KEY))
 response = json.loads(response.text)
 
 # on crée des listes à partir des clés et des valeurs du dictionnaire
-key_list = list(response['Time Series (Daily)'].keys())
-value_list = [list(element.values()) for element in list(response['Time Series (Daily)'].values())]
+try:
+    key_list = list(response['Time Series (Daily)'].keys())
+    value_list = [list(element.values()) for element in list(response['Time Series (Daily)'].values())]
+except KeyError:
+    print("La requête a été mal formulée. Aucune donnée recue. Vérifiez le symbole mnémonique")
+    sys.exit()
 
 # on recrée la structure du dictionnaire mais sous forme d'une liste de tuples
 data_list = list(zip(key_list, value_list))

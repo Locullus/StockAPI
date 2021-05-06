@@ -1,13 +1,12 @@
 """
 Programme qui se connecte à une API et renvoit les données concernant un produit de bourse particulier.
-Ne semble pas disponible pour les actions européennes.
+Ne semble malheureusement pas disponible pour les actions européennes.
 
 To claim your free API key with lifetime access, visit this page :
     https://www.alphavantage.co/support
 
 """
 
-import sys
 import json
 import os
 import requests
@@ -26,12 +25,13 @@ response = requests.get(API_url.format(stock, API_KEY))
 response = json.loads(response.text)
 
 # on crée des listes à partir des clés et des valeurs du dictionnaire
-try:
-    key_list = list(response['Time Series (Daily)'].keys())
-    value_list = [list(element.values()) for element in list(response['Time Series (Daily)'].values())]
-except KeyError:
-    print("La requête a été mal formulée. Aucune donnée recue. Vérifiez le symbole mnémonique")
-    sys.exit()
+key_list = list(response['Time Series (Daily)'].keys())
+value_list = [list(element.values()) for element in list(response['Time Series (Daily)'].values())]
+
+# on réorganise la liste [open, high, low, close, volume] pour avoir [close, open, high, low]
+for element in value_list:
+    element.insert(0, element[-2])
+    del element[-2], element[-1]
 
 # on recrée la structure du dictionnaire mais sous forme d'une liste de tuples
 data_list = list(zip(key_list, value_list))
@@ -39,16 +39,17 @@ data_list = list(zip(key_list, value_list))
 # on transforme la liste de tuples en liste de listes
 data_list = [list(element) for element in data_list]
 
-# enfin on fait disparaître la sous-liste de chaque élément pour ne garder que des listes composées de strings
+# enfin on fait disparaître la sous-liste de chaque élément pour ne garder que des listes composées de strings formatées
 result = []
 for element in data_list:
     flat_list = [element[0]]
     for each_element in element[1]:
-        flat_list.append(each_element)
+        flat_list.append(str(float(each_element)))  # on formate les nombres à 2 décimales
     result.append(flat_list)
 
-# on affiche le résultat
-for element in result:
+# on slice la liste pour afficher les 10 premiers résultats sous la forme [date, close, open, high, low]
+sample = result[:10]
+for element in sample:
     print(element)
 
 # url qui renvoit le RSI 14 jours. A compléter par symbol=ACTION (ne pas oublier l'API_KEY)

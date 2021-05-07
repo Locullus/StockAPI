@@ -7,6 +7,7 @@ To claim your free API key with lifetime access, visit this page :
 
 """
 
+import pprint
 import json
 import os
 import requests
@@ -47,10 +48,11 @@ for element in data_list:
         flat_list.append(str(float(each_element)))  # on formate les nombres à 2 décimales
     result.append(flat_list)
 
-# on slice la liste pour afficher les 10 premiers résultats sous la forme [date, close, open, high, low]
+# on slice la liste pour afficher les 10 premiers résultats (sous la forme [date, close, open, high, low])
 sample = result[:10]
-for element in sample:
-    print(element)
+
+# on affiche la liste avec pprint.pprint, ce qui permet d'avoir un seul élément par ligne
+pprint.pprint(sample)
 
 # url qui renvoit le RSI 14 jours. A compléter par symbol=ACTION (ne pas oublier l'API_KEY)
 # https://www.alphavantage.co/query?function=RSI&symbol={}&interval=daily&time_period=14&series_type=close&apikey={}

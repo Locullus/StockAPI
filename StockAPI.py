@@ -1,3 +1,6 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+
 """
 Programme qui se connecte à une API et renvoit les données concernant un produit de bourse particulier.
 Ne semble malheureusement pas disponible pour les actions européennes.
